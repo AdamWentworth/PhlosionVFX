@@ -13,7 +13,7 @@ namespace vfx::preview::shared {
 struct ControllerBackedPreviewEffectTraits {
     std::string name;
     engine::tools::vfx_preview::PreviewCasterAnimationRequest casterAnimation{};
-    engine::tools::vfx_preview::PreviewPokemonSpeciesSelection previewPokemonSpecies{};
+    engine::tools::vfx_preview::PreviewActorSelection previewActors{};
     bool wantsExactClipMotionPreview = false;
     bool wantsTargetSurfaceImpactPoint = false;
     std::function<void(engine::tools::vfx_preview::PreviewSceneState&)> afterActivated;
@@ -77,8 +77,8 @@ public:
         return traits_.casterAnimation;
     }
 
-    engine::tools::vfx_preview::PreviewPokemonSpeciesSelection previewPokemonSpecies() const override {
-        return traits_.previewPokemonSpecies;
+    engine::tools::vfx_preview::PreviewActorSelection previewActors() const override {
+        return traits_.previewActors;
     }
 
     bool wantsExactClipMotionPreview() const override {
