@@ -21,8 +21,8 @@ generated/
 
 # Local diagnostics and private payloads
 artifacts/
-assets/
-config/
+private/
+local-content/
 *.log
 .codex/
 __pycache__/
