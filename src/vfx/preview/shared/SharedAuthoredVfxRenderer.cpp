@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -695,15 +696,50 @@ bool loadTextureRgba(const std::string& texturePath,
 
 } // namespace
 
+SharedAuthoredVfxRenderer::~SharedAuthoredVfxRenderer() = default;
+
+void SharedAuthoredVfxRenderer::setRenderBackend(
+    IRenderBackend* backend) {
+    externalBackend_ = backend;
+}
+
+IRenderBackend* SharedAuthoredVfxRenderer::activeBackend() {
+    if (externalBackend_) {
+        return externalBackend_;
+    }
+    if (!fallbackBackend_) {
+        fallbackBackend_ =
+            std::make_unique<OpenGLRenderBackend>();
+        fallbackBackend_->onResize(
+            surfaceWidth_,
+            surfaceHeight_);
+    }
+    return fallbackBackend_.get();
+}
+
 void SharedAuthoredVfxRenderer::onResize(int width, int height) {
-    backend_.onResize(width, height);
+    surfaceWidth_ = std::max(1, width);
+    surfaceHeight_ = std::max(1, height);
+    if (fallbackBackend_) {
+        fallbackBackend_->onResize(
+            surfaceWidth_,
+            surfaceHeight_);
+    }
 }
 
 void SharedAuthoredVfxRenderer::render(const SharedAuthoredBatchVFX& effect,
                                        const Camera3D& camera,
                                        int surfaceWidth,
                                        int surfaceHeight) {
-    const ScopedGlPreviewRenderState savedGlState;
+    IRenderBackend* backend = activeBackend();
+    if (!backend) return;
+    std::unique_ptr<ScopedGlPreviewRenderState>
+        savedGlState;
+    if (backend->requiresOpenGLContext()) {
+        savedGlState =
+            std::make_unique<
+                ScopedGlPreviewRenderState>();
+    }
     SharedAuthoredBatchVFX::RenderSnapshot snapshot;
     if (!effect.buildRenderSnapshot(snapshot)) return;
 
@@ -736,7 +772,7 @@ void SharedAuthoredVfxRenderer::render(const SharedAuthoredBatchVFX& effect,
     const glm::vec3 cameraForward = camera.getDirection();
     const glm::vec3 cameraTarget = camera.getTarget();
     vfx::runtime::authored_submit::submitBatches(
-        backend_,
+        *backend,
         batches,
         glm::value_ptr(viewProj),
         surfaceWidth,

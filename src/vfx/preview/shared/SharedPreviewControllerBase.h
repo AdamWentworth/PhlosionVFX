@@ -101,6 +101,7 @@ public:
         if (!renderer_) {
             renderer_ = std::make_unique<vfx::preview::authored::SharedAuthoredVfxRenderer>();
         }
+        renderer_->setRenderBackend(frame.renderer);
         lastViewMatrix_ = frame.camera.getViewMatrix();
         hasLastViewMatrix_ = true;
         self().renderPreview(*renderer_, frame);

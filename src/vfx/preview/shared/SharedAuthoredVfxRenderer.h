@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -23,6 +24,9 @@ bool loadMeshForPreview(const std::string& modelPath,
 
 class SharedAuthoredVfxRenderer {
 public:
+    ~SharedAuthoredVfxRenderer();
+
+    void setRenderBackend(IRenderBackend* backend);
     void onResize(int width, int height);
 
     void render(const SharedAuthoredBatchVFX& effect,
@@ -56,7 +60,12 @@ private:
                          const vfx::runtime::authored::TevState& tev,
                          vfx::runtime::authored_batches::TextureView& outView);
 
-    OpenGLRenderBackend backend_;
+    IRenderBackend* activeBackend();
+
+    IRenderBackend* externalBackend_ = nullptr;
+    std::unique_ptr<OpenGLRenderBackend> fallbackBackend_;
+    int surfaceWidth_ = 1;
+    int surfaceHeight_ = 1;
     std::unordered_map<std::string, BackendMeshCacheEntry> backendMeshByModelPath_;
     std::unordered_map<std::string, TextureCacheEntry> backendTextureByPath_;
 };
