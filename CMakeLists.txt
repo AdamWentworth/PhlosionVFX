@@ -32,7 +32,7 @@ set(PHLOSION_VFX_ENGINE_GIT_REPOSITORY
     CACHE STRING
     "Phlosion Engine Git repository")
 set(PHLOSION_VFX_ENGINE_GIT_TAG
-    "6436f4f78c070b7797057160c0946a6f8428af29"
+    "ca277323e9ca19d6794922fc390ab7548c5a9750"
     CACHE STRING
     "Pinned Phlosion Engine commit")
 
