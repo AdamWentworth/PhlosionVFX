@@ -454,7 +454,7 @@ bool loadMeshFromRenderDocCsv(const std::string& modelPath, MeshData& out, std::
 bool loadMeshFromGltf(const std::string& modelPath, MeshData& out, std::string* outError) {
     out = {};
     const std::string resolvedPath = resolveDataPath(modelPath);
-    auto loaded = pac::fastgltf_loader::tryLoad(resolvedPath);
+    auto loaded = engine::render::gltf::loader::tryLoad(resolvedPath);
     if (!loaded.has_value()) {
         if (outError) {
             *outError = "Unable to parse glTF/GLB";
@@ -485,7 +485,7 @@ bool loadMeshFromGltf(const std::string& modelPath, MeshData& out, std::string* 
 
             std::vector<glm::vec2> uvs = buildFallbackUvs(positions);
             int requiredTexCoord =
-                pac::model_fastgltf::requiredTexCoordForMaterial(asset, materialIndex);
+                engine::render::gltf::model::requiredTexCoordForMaterial(asset, materialIndex);
             std::string uvAttribute = "TEXCOORD_" + std::to_string(requiredTexCoord);
             auto itUv = primitive.findAttribute(uvAttribute);
             if (itUv == primitive.attributes.end()) {
